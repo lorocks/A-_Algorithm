@@ -17,6 +17,12 @@ The action set consists to 5 actions of equal cost but with different angles.
 Angles - [-60, -30, 0, 30, 60]
 
 ## User Inputs
+The program will prompt you to add the robot radius
+
+Followed by the clearance between obstacle and robot
+
+Next, the step size needs to be input
+
 The program will prompt you to add the starting location as, (x, y, ϴ)
 x - starting x location
 y - starting y location
@@ -27,11 +33,6 @@ x - goal x location
 y - goal y location
 ϴ - goal yaw angle orientation 
 
-Next, the robot radius needs to be input
-
-Followed by the clearance between obstacle and robot
-
-Finally, the step size needs to be input
 
 ## Code Execution
 The code can be executed in any way.

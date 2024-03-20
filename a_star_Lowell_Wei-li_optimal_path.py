@@ -5,6 +5,7 @@ import time
 import os
 import math
 
+
 import cv2 
 
 def createGrid(height, width, bounding_location, padding = 0, wall_padding = 0, travel_padding = 0, scale = 1):
@@ -105,8 +106,8 @@ start = time.time()
 
 backtrack_count = 0
 
-unscaled_robot_radius = 5
-unscaled_clearance = 5
+unscaled_robot_radius = int(input("\nEnter the robot radius:"))
+unscaled_clearance = int(input("\nEnter the obstacle clearance:"))
 unscaled_height = 500
 unscaled_width = 1200
 unscaled_effective_padding = unscaled_robot_radius + unscaled_clearance
@@ -116,8 +117,8 @@ scale = 1 # test scale to see speed of iteration, (9 is like 0.0966 and 0.088)
 height = unscaled_height * scale # y size
 width = unscaled_width * scale # x size
 effective_padding = unscaled_effective_padding * scale
-travel_dist = 10
-goal_threshold = travel_dist /2
+travel_dist = int(input("\nEnter step size:"))
+goal_threshold = travel_dist 
 padding = int(((travel_dist * (3 - (3)**0.5)/4) + (unscaled_effective_padding)) * scale)
 angles = [ 60, 30, 0, -30, -60 ]
 timestep = 0
@@ -177,7 +178,6 @@ while not valid:
   goal_y = int(input("\nEnter goal y position:")) * scale
   goal_index = goal_x + (width * goal_y)
   goal_theta = int(input("\nEnter goal theta position:")) % 360
-  print(goal_theta)
 
   try:
     if grid[goal_index] == 2 * height * width:
@@ -222,32 +222,13 @@ while not open.empty() and not goal_found:
       if grid[new_pos] < -10:
         continue
       
-      new_distance = heuristic((new_x, new_y), (goal_x, goal_y))
-
-      if new_distance <= 200 * scale:
-        check_angle = math.degrees(math.atan2(goal_y-new_y, goal_x-new_x))
-        minus_angle = (check_angle - 60) % 360
-        plus_angle = (check_angle + 60) % 360
-        if minus_angle > plus_angle:
-          high = minus_angle
-          low = plus_angle
-        else:
-          high = plus_angle
-          low = minus_angle
-        
-        if high >= goal_theta and low <= goal_theta:
-            cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-        else:
-        #   print(current_theta + angle)
-          cost = current_cost + (travel_dist * scale) - current_distance + new_distance + height
-      else:
-        cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-      
-    #   cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-# grid[new_pos] == -1 or
-      if grid[new_pos] > cost:
-        grid[new_pos] = cost
-        backtrack_grid[new_pos] = current_pos
+      new_distance = heuristic((new_x, new_y), (goal_x, goal_y))      
+      cost = current_cost + (travel_dist * scale) - current_distance + new_distance
+#  orgrid[new_pos] > cost
+      if grid[new_pos] == 2 * height * width or new_distance <= goal_threshold:
+        if grid[new_pos] > cost:
+            grid[new_pos] = cost
+            backtrack_grid[new_pos] = current_pos
         open.put((cost, new_pos, current_theta + angle))
 
         visited.append((new_x, new_y))
@@ -320,7 +301,6 @@ if recording:
         record.write(image)
     
     record.release()
-
 
     print(f"Video Saving: {time.time() - start} seconds")
 
