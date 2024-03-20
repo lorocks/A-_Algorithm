@@ -228,27 +228,8 @@ while not open.empty() and not goal_found:
         continue
       
       new_distance = heuristic((new_x, new_y), (goal_x, goal_y))
+      cost = current_cost + (travel_dist * scale) - current_distance + new_distance
 
-      if new_distance <= 200 * scale:
-        check_angle = math.degrees(math.atan2(goal_y-new_y, goal_x-new_x))
-        minus_angle = (check_angle - 60) % 360
-        plus_angle = (check_angle + 60) % 360
-        if minus_angle > plus_angle:
-          high = minus_angle
-          low = plus_angle
-        else:
-          high = plus_angle
-          low = minus_angle
-        
-        if high >= goal_theta and low <= goal_theta:
-            cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-        else:
-        #   print(current_theta + angle)
-          cost = current_cost + (travel_dist * scale) - current_distance + new_distance + height
-      else:
-        cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-      
-    #   cost = current_cost + (travel_dist * scale) - current_distance + new_distance
 # grid[new_pos] == -1 or
       if grid[new_pos] > cost:
         grid[new_pos] = cost
