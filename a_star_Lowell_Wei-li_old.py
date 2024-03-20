@@ -1,14 +1,10 @@
 from queue import PriorityQueue
-import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-import imutils
 import time
 import os
 import math
-from matplotlib.animation import FuncAnimation
-from matplotlib.patches import Polygon
-from matplotlib import animation
+
 
 import cv2 
 
