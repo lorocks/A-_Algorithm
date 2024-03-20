@@ -321,4 +321,25 @@ if recording:
     
     record.release()
 
-print(f"Video Saving: {time.time() - start} seconds")
+
+    print(f"Video Saving: {time.time() - start} seconds")
+
+    # Display video of full algorithm
+    cap = cv2.VideoCapture("final_video.avi")
+
+    if (cap.isOpened()== False):
+        print("Error opening video stream or file")
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+
+        if ret == True:
+            cv2.imshow("Djikstra", frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        else:
+            break
+
+    cap.release()
