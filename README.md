@@ -48,3 +48,7 @@ After code execution takes place, a video showing the search will pop up.
 
 ## Project Video
 The following video shows the grid search for starting location (50, 60, 0) and goal location (1160, 450, 210)
+
+
+https://github.com/lorocks/A-_Algorithm/assets/63993526/12b63636-c9c7-477a-9847-0ddc5b24d36d
+
