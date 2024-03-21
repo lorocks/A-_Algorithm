@@ -47,4 +47,4 @@ After code execution takes place, a video showing the search will pop up.
 
 
 ## Project Video
-The following video shows the grid search for starting location (50, 60, 0) and goal location (1160, 450, 180)
+The following video shows the grid search for starting location (50, 60, 0) and goal location (1160, 450, 210)
