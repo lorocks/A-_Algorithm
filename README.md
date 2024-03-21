@@ -17,10 +17,12 @@ The action set consists to 5 actions of equal cost but with different angles.
 Angles - [-60, -30, 0, 30, 60]
 
 ## Code Files
-There are two code files, one find the optimal path to the goal point and the other finds optimal path while keeping in mind the required goal orientation.
+There are four code files, some find the optimal path to the goal point and the others finds optimal path while keeping in mind the required goal orientation.
 
 1. a_star_Lowell-Wei-Li_optimal_path.py - Only finds optimal path to goal point
-2. a_star_Lowell_Wei-Li_all_angles.py - Finds optimal path for the given goal point and goal orientation
+2. a_star_Lowell_Wei-Li_all_angles.py - Finds optimal path for the given goal point and goal orientation (fails on few cases)
+3. Astar_12_version.py - Finds optimal path including goal orientation (slow runtime)
+4. Speedy_Astar.py - Finds optimal path including the goal orientation extremely fast
 
 ## User Inputs
 The program will prompt you to add the robot radius
