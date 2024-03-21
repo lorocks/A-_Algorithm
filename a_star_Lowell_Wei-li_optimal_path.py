@@ -313,7 +313,7 @@ if recording:
         ret, frame = cap.read()
 
         if ret == True:
-            cv2.imshow("Djikstra", frame)
+            cv2.imshow("A*", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

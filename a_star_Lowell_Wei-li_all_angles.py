@@ -117,7 +117,7 @@ height = unscaled_height * scale # y size
 width = unscaled_width * scale # x size
 effective_padding = unscaled_effective_padding * scale
 travel_dist = int(input("\nEnter step size:"))
-goal_threshold = travel_dist 
+goal_threshold = travel_dist / 2
 padding = int(((travel_dist * (3 - (3)**0.5)/4) + (unscaled_effective_padding)) * scale)
 angles = [ 60, 30, 0, -30, -60 ]
 timestep = 0
@@ -201,7 +201,7 @@ while not open.empty() and not goal_found:
   y_pos = int((current_pos - (current_pos % width))/width)
   current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
 
-  if not grid[current_pos] == -13 and current_distance >= goal_threshold:
+  if not grid[current_pos] == -13 and current_distance >= 1.5 * goal_threshold:
     timestep += 1
     grid[current_pos] = -13
 
@@ -242,7 +242,7 @@ while not open.empty() and not goal_found:
           goal_found = True
       
 
-      
+
 print(f"Execution time: {time.time() - start} seconds")
 
 start = time.time()
@@ -315,7 +315,7 @@ if recording:
         ret, frame = cap.read()
 
         if ret == True:
-            cv2.imshow("Djikstra", frame)
+            cv2.imshow("A*", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
