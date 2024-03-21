@@ -118,7 +118,7 @@ height = unscaled_height * scale # y size
 width = unscaled_width * scale # x size
 effective_padding = unscaled_effective_padding * scale
 travel_dist = int(input("\nEnter step size:"))
-goal_threshold = travel_dist 
+goal_threshold = travel_dist / 2
 padding = int(((travel_dist * (3 - (3)**0.5)/4) + (unscaled_effective_padding)) * scale)
 angles = [ 60, 30, 0, -30, -60 ]
 timestep = 0
@@ -204,7 +204,6 @@ while not open.empty() and not goal_found:
 
     x_pos = int(current_pos % width)
     y_pos = int((current_pos - (current_pos % width))/width)
-    # visited.append((x_pos / scale, y_pos / scale))
     current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
 
     if current_distance <= travel_dist / 2 and last_explored_speed == -1: # and current_theta == goal_theta
