@@ -176,7 +176,6 @@ while not valid:
         print("\nInvalid angle input")
         continue
       grid[angle_indices[starting_theta], current_pos] = 0
-      backtrack_grid[angle_indices[starting_theta], current_pos] = -1
       valid = True
     else:
       print("\nStarting position invalid, obstacle exists, Enter again\n")
@@ -239,7 +238,7 @@ while not open.empty() and not goal_found:
 #  orgrid[new_pos] > cost
       if grid[angle_indices[new_theta], new_pos] > cost:
         grid[angle_indices[new_theta], new_pos] = cost
-        backtrack_grid[angle_indices[new_theta], new_pos] = (current_pos * 10) + angle_indices[current_theta]
+        backtrack_grid[angle_indices[new_theta], new_pos] = (current_pos * 100) + angle_indices[current_theta]
         open.put((cost, new_pos, new_theta))
 
         visited.append((new_x, new_y))
@@ -279,8 +278,8 @@ if recording:
         # print(x_pos, y_pos)
         # print(((x_pos - goal_x)**2 + (y_pos - goal_y)**2)**0.5)
         value = backtrack_grid[index_angle, index]
-        index_angle = value % 10
-        index = int(value / 10)
+        index_angle = value % 100
+        index = int(value / 100)
     path.append((starting_x, starting_y))
     path.reverse()
 
@@ -291,10 +290,14 @@ if recording:
     image[gray == 0] = (0, 0, 0)
     image = np.ascontiguousarray(image, dtype=np.uint8)
 
-    for i in range(0, len(visited), 2):
+    visited_length = len(visited)
+    step_size = int(visited_length / (fps * 2 * 6))
+    print(visited_length, step_size)
+
+    for i in range(0, visited_length, 2):
       cv2.line(image, visited[i], visited[i+1], (125, 255, 125), 2)
 
-      if i % 500 == 0 or i < 180:
+      if i % step_size == 0 or i < 4 * fps:
         cv2.circle(image, (goal_x, goal_y), int(goal_threshold), (255, 0, 0), scale)
         image = cv2.flip(image, 0)
         image = np.uint8(image)
@@ -354,8 +357,8 @@ else:
         # print(x_pos, y_pos)
         # print(((x_pos - goal_x)**2 + (y_pos - goal_y)**2)**0.5)
         value = backtrack_grid[index_angle, index]
-        index_angle = value % 10
-        index = int(value / 10)
+        index_angle = value % 100
+        index = int(value / 100)
     path.append((starting_x, starting_y))
     path.reverse()
 
