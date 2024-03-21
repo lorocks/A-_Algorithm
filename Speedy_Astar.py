@@ -22,7 +22,7 @@ def createGrid(height, width, bounding_location, padding = 0, wall_padding = 0, 
 
 
   gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-  grid = np.full((height, width), 2 * height * width)
+  grid = np.full((height, width), 5 * height * width)
   grid[gray == 125] = -12
   grid[gray == 180] = -15
   grid[gray == 0] = -11
@@ -156,12 +156,11 @@ else:
   grid, useless = createGrid(height, width, obstacle_bounding_boxes, effective_padding, effective_padding, padding, scale)
   backtrack_grid = np.full((height*width), -1)
 
-grid = np.array([grid for i in range(12)]) # changes
-backtrack_grid = np.array([backtrack_grid for i in range(12)]) # changes
 
 end = time.time()
 print(end - start)
 
+precision = False
 
 valid = False
 while not valid:
@@ -171,11 +170,11 @@ while not valid:
 
   current_pos = starting_x + (width * starting_y)
   try:
-    if grid[angle_indices[starting_theta], current_pos] == 2 * height * width:
+    if grid[current_pos] == 5 * height * width:
       if not starting_theta % 30 == 0:
         print("\nInvalid angle input")
         continue
-      grid[angle_indices[starting_theta], current_pos] = 0
+      grid[current_pos] = 0
       valid = True
     else:
       print("\nStarting position invalid, obstacle exists, Enter again\n")
@@ -191,7 +190,7 @@ while not valid:
   goal_theta = int(input("\nEnter goal theta position:")) % 360
 
   try:
-    if grid[angle_indices[goal_theta], goal_index] == 2 * height * width:
+    if grid[goal_index] == 5 * height * width:
       if not goal_theta % 30 == 0:
         print("\nInvalid goal angle")
         continue
@@ -207,49 +206,85 @@ open.put(( heuristic((starting_x, starting_y), (goal_x, goal_y)), current_pos, s
 goal_found = False
 start = time.time()
 while not open.empty() and not goal_found:
-  current_cost, current_pos, current_theta = open.get()
+    current_cost, current_pos, current_theta = open.get()
 
-  if not grid[angle_indices[current_theta], current_pos] == -13:
-    timestep += 1
-    grid[angle_indices[current_theta], current_pos] = -13
+    if precision:
+        if not grid[angle_indices[current_theta], current_pos] == -13:
+            timestep += 1
+            grid[angle_indices[current_theta], current_pos] = -13
 
-    x_pos = int(current_pos % width)
-    y_pos = int((current_pos - (current_pos % width))/width)
-    current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
+            x_pos = int(current_pos % width)
+            y_pos = int((current_pos - (current_pos % width))/width)
+            current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
 
-    if current_distance <= travel_dist / 2 and last_explored_speed == -1: # and current_theta == goal_theta
-      last_explored_speed = current_pos
+            if current_distance <= travel_dist / 2 and last_explored_speed == -1: # and current_theta == goal_theta
+                last_explored_speed = current_pos
 
+            for angle in angles:
+                new_theta = (current_theta + angle) % 360
+                new_x = x_pos + int( travel_dist * math.cos((new_theta)*math.pi / 180) * scale)
+                new_y = y_pos + int(travel_dist * math.sin((new_theta)*math.pi / 180) * scale)
+                new_pos = new_x + (width * new_y)
 
-    for angle in angles:
-      new_theta = (current_theta + angle) % 360
-      new_x = x_pos + int( travel_dist * math.cos((new_theta)*math.pi / 180) * scale)
-      new_y = y_pos + int(travel_dist * math.sin((new_theta)*math.pi / 180) * scale)
-      new_pos = new_x + (width * new_y)
+                if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
+                    continue
+                
+                if grid[angle_indices[new_theta], new_pos] < -10:
+                    continue
+                
+                new_distance = heuristic((new_x, new_y), (goal_x, goal_y))      
+                cost = current_cost + (travel_dist * scale) - current_distance + new_distance
+            #  orgrid[new_pos] > cost
+                if grid[angle_indices[new_theta], new_pos] > cost:
+                    grid[angle_indices[new_theta], new_pos] = cost
+                    backtrack_grid[angle_indices[new_theta], new_pos] = (current_pos * 100) + angle_indices[current_theta]
+                    open.put((cost, new_pos, new_theta))
 
-      if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
-        continue
-      
-      if grid[angle_indices[new_theta], new_pos] < -10:
-        continue
-      
-      new_distance = heuristic((new_x, new_y), (goal_x, goal_y))      
-      cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-#  orgrid[new_pos] > cost
-      if grid[angle_indices[new_theta], new_pos] > cost:
-        grid[angle_indices[new_theta], new_pos] = cost
-        backtrack_grid[angle_indices[new_theta], new_pos] = (current_pos * 100) + angle_indices[current_theta]
-        open.put((cost, new_pos, new_theta))
+                    visited.append((new_x, new_y))
+                    visited.append((x_pos, y_pos))
 
-        visited.append((new_x, new_y))
-        visited.append((x_pos, y_pos))
+                    if new_distance <= goal_threshold and new_theta == goal_theta:
+                        print(new_distance)
+                        last_explored = new_pos
+                        print("Goal path found")
+                        goal_found = True
+    else:
+        if not grid[current_pos] == -13:
+            timestep += 1
+            grid[current_pos] = -13
 
-        if new_distance <= goal_threshold and new_theta == goal_theta:
-          print(new_distance)
-          last_explored = new_pos
-          print("Goal path found")
+            x_pos = int(current_pos % width)
+            y_pos = int((current_pos - (current_pos % width))/width)
+            current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
 
-          goal_found = True
+            for angle in angles:
+                new_theta = (current_theta + angle) % 360
+                new_x = x_pos + int( travel_dist * math.cos((new_theta)*math.pi / 180) * scale)
+                new_y = y_pos + int(travel_dist * math.sin((new_theta)*math.pi / 180) * scale)
+                new_pos = new_x + (width * new_y)
+
+                if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
+                    continue
+                
+                if grid[new_pos] < -10:
+                    continue
+                
+                new_distance = heuristic((new_x, new_y), (goal_x, goal_y))      
+                cost = current_cost + (travel_dist * scale) - current_distance + new_distance
+
+                if grid[new_pos] > cost:
+                    grid[new_pos] = cost
+                    backtrack_grid[new_pos] = (current_pos * 100) + angle_indices[current_theta]
+                    open.put((cost, new_pos, new_theta))
+
+                    visited.append((new_x, new_y))
+                    visited.append((x_pos, y_pos))
+            
+            if current_distance <= 50:
+                precision = True
+                grid = np.array([grid for i in range(12)]) # changes
+                backtrack_grid = np.array([backtrack_grid for i in range(12)]) # changes
+               
       
 
 
@@ -358,7 +393,11 @@ else:
         # print(((x_pos - goal_x)**2 + (y_pos - goal_y)**2)**0.5)
         value = backtrack_grid[index_angle, index]
         index_angle = value % 100
-        index = int(value / 100)
+        if index_angle > 11:
+          index = value
+          index_angle = 0
+        else:
+          index = int(value / 100)
     path.append((starting_x, starting_y))
     path.reverse()
 
