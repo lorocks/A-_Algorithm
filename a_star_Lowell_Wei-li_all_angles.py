@@ -192,20 +192,20 @@ while not valid:
 
 open.put(( heuristic((starting_x, starting_y), (goal_x, goal_y)), current_pos, starting_theta))
 
+
 goal_found = False
 start = time.time()
 while not open.empty() and not goal_found:
   current_cost, current_pos, current_theta = open.get()
+  x_pos = int(current_pos % width)
+  y_pos = int((current_pos - (current_pos % width))/width)
+  current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
 
-  if not grid[current_pos] == -13:
+  if not grid[current_pos] == -13 and current_distance >= goal_threshold:
     timestep += 1
     grid[current_pos] = -13
 
-    x_pos = int(current_pos % width)
-    y_pos = int((current_pos - (current_pos % width))/width)
-    # visited.append((x_pos / scale, y_pos / scale))
-    current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
-
+    
     if current_distance <= travel_dist / 2 and last_explored_speed == -1: # and current_theta == goal_theta
       last_explored_speed = current_pos
 
@@ -221,47 +221,28 @@ while not open.empty() and not goal_found:
       if grid[new_pos] < -10:
         continue
       
-      new_distance = heuristic((new_x, new_y), (goal_x, goal_y))
-
-      if new_distance <= 5 * new_distance:
-        check_angle = math.degrees(math.atan2(goal_y-new_y, goal_x-new_x))
-        minus_angle = (check_angle - 60) % 360
-        plus_angle = (check_angle + 60) % 360
-        if minus_angle > plus_angle:
-          high = minus_angle
-          low = plus_angle
-        else:
-          high = plus_angle
-          low = minus_angle
-        
-        if high >= goal_theta and low <= goal_theta:
-            cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-        else:
-        #   print(current_theta + angle)
-          cost = current_cost + (travel_dist * scale) - current_distance + new_distance + (1000)
-      else:
-        cost = current_cost + (travel_dist * scale) - current_distance + new_distance
-      
-    #   cost = current_cost + (travel_dist * scale) - current_distance + new_distance
+      new_distance = heuristic((new_x, new_y), (goal_x, goal_y))      
+      cost = current_cost + (travel_dist * scale) - current_distance + new_distance
 #  orgrid[new_pos] > cost
-      if grid[new_pos] == 2 * height * width or new_distance <= 5 * goal_threshold:
-        # if grid[new_pos] > cost:
-        grid[new_pos] = cost
-        backtrack_grid[new_pos] = current_pos
+      if grid[new_pos] == 2 * height * width or new_distance <= travel_dist + goal_threshold:
+        if grid[new_pos] > cost or new_distance <= travel_dist + goal_threshold:
+            grid[new_pos] = cost
+            backtrack_grid[new_pos] = current_pos
         open.put((cost, new_pos, current_theta + angle))
 
         visited.append((new_x, new_y))
         visited.append((x_pos, y_pos))
 
         if new_distance <= goal_threshold and (current_theta + angle) % 360 == goal_theta:
-          print(new_distance)
+          print(new_distance, new_x, new_y)
           last_explored = new_pos
+          backtrack_grid[new_pos] = current_pos
           print("Goal path found")
 
           goal_found = True
       
 
-
+      
 print(f"Execution time: {time.time() - start} seconds")
 
 start = time.time()
