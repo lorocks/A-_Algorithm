@@ -30,13 +30,20 @@ Followed by the clearance between obstacle and robot
 Next, the step size needs to be input
 
 The program will prompt you to add the starting location as, (x, y, ϴ)
+
 x - starting x location
+
 y - starting y location
+
 ϴ - starting yaw angle orientation 
 
+
 Next, the goal location needs to be input, (x, y, ϴ)
+
 x - goal x location
+
 y - goal y location
+
 ϴ - goal yaw angle orientation 
 
 
