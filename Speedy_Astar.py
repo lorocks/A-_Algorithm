@@ -113,7 +113,7 @@ height = unscaled_height * scale # y size
 width = unscaled_width * scale # x size
 effective_padding = unscaled_effective_padding * scale
 travel_dist = int(input("\nEnter step size:"))
-goal_threshold = travel_dist / 2
+goal_threshold = 1.5
 padding = int(((travel_dist * (3 - (3)**0.5)/4) + (unscaled_effective_padding)) * scale)
 angles = [ 60, 30, 0, -30, -60 ]
 angle_indices = {
@@ -156,6 +156,10 @@ else:
   grid, useless = createGrid(height, width, obstacle_bounding_boxes, effective_padding, effective_padding, padding, scale)
   backtrack_grid = np.full((height*width), -1)
 
+if travel_dist < 2:
+   travel_dist = 2
+elif travel_dist > 30:
+   travel_dist = 30
 
 end = time.time()
 print(end - start)
@@ -222,8 +226,8 @@ while not open.empty() and not goal_found:
 
             for angle in angles:
                 new_theta = (current_theta + angle) % 360
-                new_x = x_pos + int( travel_dist * math.cos((new_theta)*math.pi / 180) * scale)
-                new_y = y_pos + int(travel_dist * math.sin((new_theta)*math.pi / 180) * scale)
+                new_x = x_pos + int(round((travel_dist * math.cos((new_theta)*math.pi / 180) * scale) - 0.00001))
+                new_y = y_pos + int(round((travel_dist * math.sin((new_theta)*math.pi / 180) * scale) - 0.00001))
                 new_pos = new_x + (width * new_y)
 
                 if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
@@ -259,8 +263,8 @@ while not open.empty() and not goal_found:
 
             for angle in angles:
                 new_theta = (current_theta + angle) % 360
-                new_x = x_pos + int( travel_dist * math.cos((new_theta)*math.pi / 180) * scale)
-                new_y = y_pos + int(travel_dist * math.sin((new_theta)*math.pi / 180) * scale)
+                new_x = x_pos + int(round((travel_dist * math.cos((new_theta)*math.pi / 180) * scale) - 0.00001))
+                new_y = y_pos + int(round((travel_dist * math.sin((new_theta)*math.pi / 180) * scale) - 0.00001))
                 new_pos = new_x + (width * new_y)
 
                 if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
