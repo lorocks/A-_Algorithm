@@ -284,7 +284,7 @@ while not open.empty() and not goal_found:
                     visited.append((new_x, new_y))
                     visited.append((x_pos, y_pos))
             
-            if current_distance <= 50:
+            if current_distance <= 5 * travel_dist:
                 precision = True
                 grid = np.array([grid for i in range(12)]) # changes
                 backtrack_grid = np.array([backtrack_grid for i in range(12)]) # changes
