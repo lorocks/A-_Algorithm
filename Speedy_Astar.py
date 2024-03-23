@@ -99,8 +99,6 @@ def goal_reached(node, goal, threshold):
 
 start = time.time()
 
-backtrack_count = 0
-
 unscaled_robot_radius = int(input("\nEnter the robot radius:"))
 unscaled_clearance = int(input("\nEnter the obstacle clearance:"))
 unscaled_height = 500
