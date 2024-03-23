@@ -219,13 +219,14 @@ while not open.empty() and not goal_found:
             y_pos = int((current_pos - (current_pos % width))/width)
             current_distance = heuristic((x_pos, y_pos), (goal_x, goal_y))
 
-            if current_distance <= travel_dist / 2 and last_explored_speed == -1: # and current_theta == goal_theta
+            if current_distance <= goal_threshold and last_explored_speed == -1: # and current_theta == goal_theta
                 last_explored_speed = current_pos
+                angle_speed = current_theta
 
             for angle in angles:
                 new_theta = (current_theta + angle) % 360
-                new_x = x_pos + int(round((travel_dist * math.cos((new_theta)*math.pi / 180) * scale) - 0.00001))
-                new_y = y_pos + int(round((travel_dist * math.sin((new_theta)*math.pi / 180) * scale) - 0.00001))
+                new_x = x_pos + int(((travel_dist * math.cos((new_theta)*math.pi / 180) * scale) ))
+                new_y = y_pos + int(((travel_dist * math.sin((new_theta)*math.pi / 180) * scale) ))
                 new_pos = new_x + (width * new_y)
 
                 if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
@@ -261,8 +262,8 @@ while not open.empty() and not goal_found:
 
             for angle in angles:
                 new_theta = (current_theta + angle) % 360
-                new_x = x_pos + int(round((travel_dist * math.cos((new_theta)*math.pi / 180) * scale) - 0.00001))
-                new_y = y_pos + int(round((travel_dist * math.sin((new_theta)*math.pi / 180) * scale) - 0.00001))
+                new_x = x_pos + int(((travel_dist * math.cos((new_theta)*math.pi / 180) * scale) ))
+                new_y = y_pos + int(((travel_dist * math.sin((new_theta)*math.pi / 180) * scale) ))
                 new_pos = new_x + (width * new_y)
 
                 if new_x < 0 or new_y < 0 or new_x >= width or new_y >= height or new_pos >= height*width:
@@ -305,6 +306,7 @@ if recording:
       index_angle = angle_indices[goal_theta]
     else:
       index = last_explored_speed
+      index_angle = angle_speed
     last = 0
     while backtrack_grid[index_angle, index] > 0:
         x_pos = int(index % width)
@@ -384,6 +386,7 @@ else:
       index_angle = angle_indices[goal_theta]
     else:
       index = last_explored_speed
+      index_angle = angle_indices[angle_speed]
     last = 0
     while backtrack_grid[index_angle, index] > 0:
         x_pos = int(index % width)
