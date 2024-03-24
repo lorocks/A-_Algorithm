@@ -4,10 +4,9 @@ import cv2
 import time
 import os
 import math
-
-
 import cv2 
 
+# Fucntion to create the grid space
 def createGrid(height, width, bounding_location, padding = 0, wall_padding = 0, travel_padding = 0, scale = 1):
   image = np.full((height, width, 3), 255, dtype=np.uint8)
 
@@ -29,6 +28,7 @@ def createGrid(height, width, bounding_location, padding = 0, wall_padding = 0, 
   grid = grid.reshape(-1)
   return grid, gray
 
+# Function to add padding for step size
 def setTravelPadding(image, padding, obstacles, scale, value):
   for obstacle in obstacles:
     obstacle = np.array(obstacle, dtype=np.int32) * scale
@@ -37,6 +37,7 @@ def setTravelPadding(image, padding, obstacles, scale, value):
   
   return image
 
+# Function to add padding for walls
 def setWallPadding(image, padding, value):
   height, width, _ = image.shape
   points = [
@@ -49,6 +50,7 @@ def setWallPadding(image, padding, value):
     cv2.rectangle(image, points[i], points[i+1], (value, value, value), -1)
   return image
 
+# Function to add obstacles and their padding
 def setObstaclesAndTruePadding(image, bounding_location, padding, scale, value):
   if padding > 0:
     doPadding = True
@@ -86,17 +88,13 @@ def setObstaclesAndTruePadding(image, bounding_location, padding, scale, value):
 
   return image
 
-
+# Function to calculate Euclidean distance
 def heuristic(node, goal):
     return ((node[0] - goal[0])**2 + (node[1] - goal[1])**2)**0.5
     # return distance.euclidean(node, goal) #try
 
-def goal_reached(node, goal, threshold):
-    # if len(node) < 2 or len(goal) < 2:
-    #     raise ValueError("node and goal must be sequences with at least two elements each")
-    return heuristic(node, goal) <= threshold
 
-
+# Set initial variables
 start = time.time()
 
 unscaled_robot_radius = int(input("\nEnter the robot radius:"))
@@ -132,7 +130,7 @@ timestep = 0
 
 last_explored = last_explored_speed = -1
 
-recording = False
+recording = True
 
 obstacle_file_path = ""
 
@@ -164,6 +162,7 @@ print(end - start)
 
 precision = False
 
+# Get starting position
 valid = False
 while not valid:
   starting_x = int(input("\nEnter starting x position:")) * scale
@@ -184,6 +183,7 @@ while not valid:
     print("\nStarting position invalid, obstacle exists, Enter again\n")
 
 
+# Get goal position
 valid = False
 while not valid:
   goal_x = int(input("\nEnter goal x position:")) * scale
@@ -203,6 +203,7 @@ while not valid:
     print("\nGoal position invalid, obstacle exists, Enter again\n")
 
 
+# Start A*
 open.put(( heuristic((starting_x, starting_y), (goal_x, goal_y)), current_pos, starting_theta))
 
 goal_found = False
@@ -210,6 +211,7 @@ start = time.time()
 while not open.empty() and not goal_found:
     current_cost, current_pos, current_theta = open.get()
 
+    # Condition to perform optimal path finding with angle
     if precision:
         if not grid[angle_indices[current_theta], current_pos] == -13:
             timestep += 1
@@ -251,6 +253,7 @@ while not open.empty() and not goal_found:
                         last_explored = new_pos
                         print("Goal path found")
                         goal_found = True
+    # Condition to perform optimal path finding
     else:
         if not grid[current_pos] == -13:
             timestep += 1
@@ -282,7 +285,7 @@ while not open.empty() and not goal_found:
 
                     visited.append((new_x, new_y))
                     visited.append((x_pos, y_pos))
-            
+            # Switch to optimal path finding with angle
             if current_distance <= 5 * travel_dist:
                 precision = True
                 grid = np.array([grid for i in range(12)]) # changes
@@ -293,8 +296,9 @@ while not open.empty() and not goal_found:
 
 print(f"Execution time: {time.time() - start} seconds")
 
+
 start = time.time()
-# Display
+# Display or record video
 if recording:
     size = (width, height)
     fps = 90
